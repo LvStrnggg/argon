@@ -40,6 +40,14 @@ public final class ClickGui extends Screen {
 	}
 
 	@Override
+	protected void setInitialFocus() {
+		if (client == null) {
+			return;
+		}
+		super.setInitialFocus();
+	}
+
+	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		if (mc.currentScreen == this) {
 			if (Argon.INSTANCE.previousScreen != null)
