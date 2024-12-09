@@ -17,12 +17,16 @@ import net.minecraft.item.SwordItem;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.glfw.GLFW;
 
 public final class AimAssist extends Module implements HudListener, MouseMoveListener {
 	private final BooleanSetting stickyAim = new BooleanSetting(EncryptedString.of("Sticky Aim"), false)
 			.setDescription(EncryptedString.of("Aims at the last attacked player"));
 
 	private final BooleanSetting onlyWeapon = new BooleanSetting(EncryptedString.of("Only Weapon"), true);
+
+	private final BooleanSetting onLeftClick = new BooleanSetting(EncryptedString.of("On Left Click"), false)
+			.setDescription(EncryptedString.of("Only gets triggered if holding down left click"));
 	private final ModeSetting<AimMode> aimAt = new ModeSetting<>(EncryptedString.of("Aim At"), AimMode.Head, AimMode.class);
 
 	private final BooleanSetting stopAtTargetVertical = new BooleanSetting(EncryptedString.of("Stop at Target Vert"), true)
@@ -82,7 +86,7 @@ public final class AimAssist extends Module implements HudListener, MouseMoveLis
 				-1,
 				Category.COMBAT);
 
-		addSettings(stickyAim, onlyWeapon, aimAt, stopAtTargetVertical, stopAtTargetHorizontal, radius, seeOnly, lookAtNearest, fov, pitchSpeed, yawSpeed, speedChange, randomization, yawAssist, pitchAssist, waitFor, lerp, posMode);
+		addSettings(stickyAim, onlyWeapon, onLeftClick, aimAt, stopAtTargetVertical, stopAtTargetHorizontal, radius, seeOnly, lookAtNearest, fov, pitchSpeed, yawSpeed, speedChange, randomization, yawAssist, pitchAssist, waitFor, lerp, posMode);
 	}
 
 	@Override
@@ -116,6 +120,9 @@ public final class AimAssist extends Module implements HudListener, MouseMoveLis
 			return;
 
 		if (onlyWeapon.getValue() && !(mc.player.getMainHandStack().getItem() instanceof SwordItem || mc.player.getMainHandStack().getItem() instanceof AxeItem))
+			return;
+
+		if (onLeftClick.getValue() && GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_PRESS)
 			return;
 
 		PlayerEntity target = WorldUtils.findNearestPlayer(mc.player, radius.getValueFloat(), seeOnly.getValue(), true);
