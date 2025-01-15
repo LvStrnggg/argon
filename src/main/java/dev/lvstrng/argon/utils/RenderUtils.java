@@ -121,7 +121,7 @@ public final class RenderUtils {
 		double rad = current[2];
 		float cos = (float) (rad);
 		bufferBuilder.vertex(matrix, (float) current[0], (float) current[1] + cos, 0.0F).color(cr, cg, cb, ca);
-		bufferBuilder.vertex(matrix, (float) (current[0]), (float) (current[1] + cos + width), 0.0F).color(cr, cg, cb, ca);
+		bufferBuilder.vertex(matrix, (float) (current[0] + cos), (float) (current[1] + cos + width), 0.0F).color(cr, cg, cb, ca);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 
@@ -364,5 +364,73 @@ public final class RenderUtils {
 		RenderSystem.setShader(shader);
 		BufferRenderer.drawWithGlobalProgram(bb.end());
 		cleanup();
+	}
+
+	public static void renderBlurredBox(MatrixStack matrices, float x, float y, float width, float height, float blurRadius, Color color) {
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		
+		// Render blur
+		for (int i = 0; i < 3; i++) {
+			float spread = (blurRadius * 0.5f) * (i + 1);
+			Color blurColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() / (i + 2));
+			renderRoundedQuad(matrices, blurColor, x - spread, y - spread, x + width + spread, y + height + spread, 8, 8, 8, 8, 15);
+		}
+		
+		RenderSystem.disableBlend();
+	}
+
+	public static void renderDropShadow(MatrixStack matrices, float x, float y, float width, float height, float shadowRadius, Color shadowColor) {
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		
+		// Enhanced Gaussian-like drop shadow with more visible layers
+		float[] alphaSteps = {0.32f, 0.24f, 0.16f, 0.08f, 0.04f};
+		float[] spreadSteps = {0.6f, 1.2f, 1.8f, 2.4f, 3f};
+		
+		for (int i = 0; i < 5; i++) {
+			float spread = shadowRadius * spreadSteps[i];
+			Color currentColor = new Color(0, 0, 0, (int)(160 * alphaSteps[i]));
+			renderRoundedQuad(matrices, currentColor, 
+				x + spread * 0.25f,
+				y + spread * 0.75f, // More vertical offset for depth
+				x + width + spread * 0.25f,
+				y + height + spread * 0.75f,
+				8, 8, 8, 8, 15);
+		}
+		
+		RenderSystem.disableBlend();
+	}
+
+	public static void renderBlurredBackground(MatrixStack matrices, float x, float y, float width, float height, Color color) {
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		
+		// Multi-layer blur effect
+		float[] alphaSteps = {0.6f, 0.4f, 0.2f, 0.1f};
+		float[] spreadSteps = {1f, 2f, 3f, 4f};
+		
+		// Base dark background
+		Color bgColor = new Color(0, 0, 0, 180);
+		renderRoundedQuad(matrices, bgColor, x, y, x + width, y + height, 8, 8, 8, 8, 15);
+		
+		// Blur layers
+		for (int i = 0; i < 4; i++) {
+			float spread = spreadSteps[i];
+			Color blurColor = new Color(
+				color.getRed(),
+				color.getGreen(),
+				color.getBlue(),
+				(int)(80 * alphaSteps[i])
+			);
+			renderRoundedQuad(matrices, blurColor, 
+				x - spread,
+				y - spread,
+				x + width + spread,
+				y + height + spread,
+				8, 8, 8, 8, 15);
+		}
+		
+		RenderSystem.disableBlend();
 	}
 }
