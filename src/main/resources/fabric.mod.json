@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "id": "immediatelyfast",
+  "id": "muam3r",
   "version": "1.2.11+1.21",
-  "name": "ImmediatelyFast",
-  "description": "Speed up and optimize immediate mode rendering in Minecraft",
+  "name": "muam3r",
+  "description": "A Minecraft client.",
   "authors": [
-    "RK_01"
+    "muam3r"
   ],
-  "contact": {
-    "homepage": "https://modrinth.com/mod/immediatelyfast",
-    "sources": "https://github.com/RaphiMC/ImmediatelyFast",
-    "issues": "https://github.com/RaphiMC/ImmediatelyFast/issues"
-  },
   "license": "LGPL-3.0",
-  "icon": "assets/immediatelyfast/icon.png",
+  "icon": "assets/muam3r/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.lvstrng.argon.Main"
+      "dev.lvstrng.muam3r.Main"
     ]
   },
   "mixins": [
